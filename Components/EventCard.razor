@@ -1,0 +1,37 @@
+@* EventCard.razor *@
+@inject NavigationManager Navigation
+
+<div class="event-card">
+    @if (IsValid)
+    {
+        <h3>@EventName</h3>
+        <p><strong>Date:</strong> @EventDate</p>
+        <p><strong>Location:</strong> @EventLocation</p>
+        <button @onclick="NavigateToDetails">View Details</button>
+    }
+    else
+    {
+        <p>Invalid event details provided.</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? EventName { get; set; }
+
+    [Parameter]
+    public string? EventDate { get; set; }
+
+    [Parameter]
+    public string? EventLocation { get; set; }
+
+    private void NavigateToDetails()
+    {
+        Navigation.NavigateTo($"/details");
+    }
+
+    private bool IsValid =>
+    !string.IsNullOrWhiteSpace(EventName) &&
+    !string.IsNullOrWhiteSpace(EventDate) &&
+    !string.IsNullOrWhiteSpace(EventLocation);
+}

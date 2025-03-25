@@ -1,0 +1,59 @@
+@page "/"
+
+@foreach (var eventItem in DisplayedEvents)
+{
+    <EventCard EventName="@eventItem.Name" EventDate="@eventItem.Date" EventLocation="@eventItem.Location" />
+}
+
+@if (DisplayedEvents.Count < Events.Count)
+{
+    <button @onclick="LoadNextPage">View More</button>
+}
+
+@code {
+    public List<Event> Events { get; set; } = new List<Event>();
+    public List<Event> DisplayedEvents { get; set; } = new List<Event>();
+    private int ItemsPerPage = 10;
+    private int CurrentPage = 1;
+
+    protected override void OnInitialized()
+    {
+        // Generate dummy data
+        Events = Enumerable.Range(1, 1000).Select(i => new Event
+        {
+            Name = $"Event {DummyEventNames[i % DummyEventNames.Length]}",
+            Date = $"2025-08-{i % 30 + 1:D2}",
+            Location = DummyEventLocations[i % DummyEventLocations.Length]
+        }).ToList();
+
+        // Load the first batch of events
+        LoadNextPage();
+    }
+
+    private void LoadNextPage()
+    {
+        // Load the next batch of items based on the current page
+        var nextBatch = Events.Skip((CurrentPage - 1) * ItemsPerPage).Take(ItemsPerPage).ToList();
+        DisplayedEvents.AddRange(nextBatch);
+        CurrentPage++;
+    }
+
+    private readonly string[] DummyEventNames = new string[]
+    {
+        "Annual Conference", "Product Launch", "Charity Gala", "Tech Expo", "Music Festival",
+        "Startup Meetup", "Art Exhibition", "Food Fair", "Film Screening", "Workshop Series"
+    };
+
+    private readonly string[] DummyEventLocations = new string[]
+    {
+        "London", "New York", "Berlin", "Tokyo", "Paris", "San Francisco", "Sydney", "Rome",
+        "Dubai", "Singapore"
+    };
+
+    public class Event
+    {
+        public required string Name { get; set; }
+        public required string Date { get; set; }
+        public required string Location { get; set; }
+    }
+}

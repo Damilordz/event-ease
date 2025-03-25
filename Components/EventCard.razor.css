@@ -1,0 +1,30 @@
+/* EventCard.razor.css */
+.event-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+    background-color: #f9f9f9;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.event-card h3 {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.event-card p {
+    font-size: 1em;
+    color: #555;
+    margin: 4px 0;
+}
+
+.event-card strong {
+    color: #000;
+}

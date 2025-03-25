@@ -1,0 +1,81 @@
+@page "/registration"
+@inject NavigationManager Navigation
+@inject EventEase.Services.UserSessionService UserSession
+@inject EventEase.Services.AttendanceTracker AttendanceService
+@using System.ComponentModel.DataAnnotations
+
+<h1 style="text-align: center;">Register for an Event</h1>
+
+@if (!registrationSuccess)
+{
+    <EditForm Model="@RegistrationData" OnValidSubmit="HandleValidSubmit" class="registration-form">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="validation-summary" />
+
+        <div>
+            <label for="name">Name:</label>
+            <InputText id="name" @bind-Value="RegistrationData.Name" class="input-field" />
+            <ValidationMessage For="@(() => RegistrationData.Name)" />
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <InputText id="email" @bind-Value="RegistrationData.Email" class="input-field" />
+            <ValidationMessage For="@(() => RegistrationData.Email)" />
+        </div>
+        <button type="submit">Register</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <p class="error-message">@ErrorMessage</p>
+    }
+}
+else
+{
+    <div class="registration-success">
+        <p>Registration successful!</p>
+        <button @onclick="ReturnHome">Back to Events</button>
+    </div>
+}
+
+@code {
+    public RegistrationForm RegistrationData { get; set; } = new RegistrationForm();
+    private string ErrorMessage { get; set; }
+    private bool registrationSuccess = false;
+
+    private void HandleValidSubmit()
+    {
+        try
+        {
+            // Register the user and track attendance
+            UserSession.RegisterUser(RegistrationData.Name ?? string.Empty, RegistrationData.Email ?? string.Empty);
+            AttendanceService.RegisterAttendance(RegistrationData.Name ?? string.Empty);
+
+            // Indicate successful registration
+            registrationSuccess = true;
+            ErrorMessage = null; // Clear any previous error messages
+        }
+        catch (Exception ex)
+        {
+            // Display error message to user
+            registrationSuccess = false;
+            ErrorMessage = "An error occurred during registration. Please try again.";
+            Console.WriteLine($"Error during registration: {ex.Message}"); // Log for debugging
+        }
+    }
+
+    private void ReturnHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    public class RegistrationForm
+    {
+        [Required(ErrorMessage = "Name is required.")]
+        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email address.")]
+        public string? Email { get; set; }
+    }
+}
